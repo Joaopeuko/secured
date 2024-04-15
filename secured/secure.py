@@ -18,7 +18,7 @@ class Secure(str):
 
     def __repr__(self):
         return "<Sensitive data secured>"
-    
+
     def __str__(self) -> str:
         return repr(self)
 
