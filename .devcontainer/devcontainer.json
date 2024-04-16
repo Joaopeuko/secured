@@ -1,8 +1,7 @@
 {
-    "name": "secured",
-    "build": {
-        "dockerfile": "../Dockerfile"
-	},
-    "postCreateCommand": "apt-get -y update && apt-get -y install git && pip install pre-commit && pre-commit install"
-
+  "name": "secured",
+  "build": {
+    "dockerfile": "../Dockerfile"
+  },
+  "postCreateCommand": "apt-get -y update && apt-get -y install git && pip install pre-commit && pre-commit install"
 }
