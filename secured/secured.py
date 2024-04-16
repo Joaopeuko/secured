@@ -1,7 +1,6 @@
 import os
 import yaml
 from typing import Union, List
-from dotenv import load_dotenv
 from secure import Secure
 from pathlib import Path
 
@@ -26,8 +25,7 @@ class Secured:
 
         return data
 
-    def get(self, key: str, required: bool = False, dotenv_path = None) -> Union[Secure, None]:
-        load_dotenv(dotenv_path)
+    def get(self, key: str, required: bool = False) -> Secure | None:
 
         # Check YAML data first
         yaml_value = self.yaml_data.get(key)
