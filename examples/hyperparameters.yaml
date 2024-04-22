@@ -1,0 +1,40 @@
+name: hyperparameters
+
+model_parameters:
+  learning_rate: 0.001
+  batch_size: 32
+  epochs: 50
+  dropout_rate: 0.2
+
+optimizer:
+  type: adam
+  momentum: 0.9
+  epsilon: 1e-7
+
+loss_function:
+  type: categorical_crossentropy
+  weight: 0.5
+
+regularization:
+  type: l2
+  lambda: 0.01
+
+data_augmentation:
+  rotation_range: 15
+  width_shift_range: 0.1
+  height_shift_range: 0.1
+  horizontal_flip: true
+
+architecture:
+  layers:
+    - type: dense
+      units: 128
+      activation: relu
+    - type: dropout
+      rate: 0.3
+    - type: dense
+      units: 64
+      activation: relu
+    - type: output
+      units: 10
+      activation: softmax

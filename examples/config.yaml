@@ -1,0 +1,43 @@
+name: config
+
+configuration:
+  environment: development
+  version: '1.1.0-beta'
+
+databases:
+  db3:
+    connection:
+      host: db-server.local
+      port: 5432
+      database_name: development_db
+    options:
+      timeout: 25
+      retries: 4
+
+  db4:
+    connection:
+      host: db-server.local
+      port: 5433
+      database_name: staging_db
+    options:
+      timeout: 15
+      retries: 1
+
+services:
+  analytics-service:
+    endpoints:
+      api:
+        - endpoint: /api/v1/data
+          methods: [GET]
+        - endpoint: /api/v1/report
+          methods: [POST]
+
+  notification-service:
+    endpoints:
+      api:
+        - endpoint: /api/v1/send
+          methods: [POST]
+        - endpoint: /api/v1/status
+          methods: [GET]
+    host: notification-server.local
+    port: 9090

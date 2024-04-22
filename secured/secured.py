@@ -1,7 +1,7 @@
 import os
 import yaml
 from typing import List
-from secure import Secure
+from .secure import Secure
 from pathlib import Path
 
 class AttrDict(dict):
@@ -48,8 +48,3 @@ class Secured:
                 raise ValueError(f"Key '{key}' not found in the OS environment.")
 
         return Secure(env_value)
-
-
-secured = Secured('config-secrets.yaml', secure=True)
-
-print(secured.config_secrets.test.test1.test2.test4)
