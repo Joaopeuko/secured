@@ -9,29 +9,33 @@ class AttrDict(dict):
     A dictionary subclass that allows attribute-style access and can optionally secure its leaf values.
 
     This class extends the standard dictionary to support access via attributes as well as keys. If initialized
-    with `secure=True`, all non-dictionary values are wrapped using the Secure class to obscure sensitive information.
+    with `secure=True`, all non-dictionary values are wrapped using the Secure class to obscure sensitive information
+    with an optional custom message.
 
     Attributes:
         secure (bool): Determines whether the dictionary's values should be automatically secured.
+        message (str): Custom message to display when values are secured.
 
     Examples:
-        >>> ad = AttrDict(secure=True)
+        >>> ad = AttrDict(secure=True, message="<Custom Secured>")
         >>> ad['password'] = 'my_secret'
-        >>> print(ad.password)  # Assuming Secure.__str__() returns '<Secured>'
-        '<Secured>'
+        >>> print(ad.password)
+        '<Custom Secured>'
     """
 
-    def __init__(self, *args, secure: bool = False, **kwargs) -> None:
+    def __init__(self, *args, secure: bool = False, message: str = "<Sensitive data secured>", **kwargs) -> None:
         """
-        Initialize the AttrDict with the same arguments as a normal dict, plus a `secure` option.
+        Initialize the AttrDict with the same arguments as a normal dict, plus options to secure.
 
         Args:
             *args: Variable length argument list for dictionary items.
-            secure (bool): If True, non-dict values will be wrapped by the Secure class.
+            secure (bool): If True, non-dict values will be wrapped by the Secure class with the given message.
+            message (str): Custom message used when values are secured.
             **kwargs: Arbitrary keyword arguments for dictionary items.
         """
         super().__init__(*args, **kwargs)
         self.secure = secure
+        self.message = message
         self._convert_dicts()
 
     def _convert_dicts(self) -> None:
@@ -50,9 +54,9 @@ class AttrDict(dict):
             Union[T, Secure]: The converted value, secured if `secure` is True and not a dictionary.
         """
         if isinstance(value, dict):
-            return AttrDict(value, secure=self.secure)
+            return AttrDict(value, secure=self.secure, message=self.message)
         elif self.secure:
-            return Secure(value)
+            return Secure(value, self.message)
         return value
 
     def __getattr__(self, item: str) -> Union[T, 'Secure']:
@@ -83,7 +87,7 @@ class AttrDict(dict):
 
         This directly modifies the dictionary if `key` is not a special attribute.
         """
-        if key in ['secure', '_initializing']:
+        if key in ['secure', 'message']:
             super().__setattr__(key, value)
         else:
             self[key] = self._convert_value(value)
