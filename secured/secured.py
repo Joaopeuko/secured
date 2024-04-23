@@ -1,50 +1,49 @@
 import os
 import yaml
-from typing import List
+from typing import Union, List, Any
 from .secure import Secure
 from pathlib import Path
-
-class AttrDict(dict):
-    def __init__(self, *args, secure, **kwargs):
-        super(AttrDict, self).__init__(*args, **kwargs)
-        self.secure = secure
-        for key, value in self.items():
-            if isinstance(value, dict):
-                self[key] = AttrDict(value, secure=secure)
-
-    def __getattr__(self, item):
-        value = self[item]
-        if isinstance(value, dict):
-            return value
-        else:
-            return Secure(value) if self.secure else value
-
-    def __setattr__(self, key, value):
-        super(AttrDict, self).__setattr__(key, value)
+from .attribute import AttrDict
 
 class Secured:
-    def __init__(self, yaml_path: str | List[str] = None, secure=False) -> None:
+    def __init__(self, yaml_paths: Union[str, List[str]] = None, secure: bool = False, as_attrdict: bool = True):
+        self.as_attrdict = as_attrdict
+        self.load_yaml(yaml_paths=yaml_paths, secure=secure)
 
-        self.yaml_files = self.load_yaml(yaml_path=yaml_path, secure=secure)
-
-    def load_yaml(self, yaml_path: str | List[str], secure) -> None:
-        if yaml_path is None:
+    def load_yaml(self, yaml_paths: Union[str, List[str]], secure: bool):
+        if not yaml_paths:
             return
-
-        yaml_paths = [yaml_path] if isinstance(yaml_path, str) else yaml_path
+        if isinstance(yaml_paths, str):
+            yaml_paths = [yaml_paths]
         for path in yaml_paths:
             with open(path, 'r') as file:
                 file_data = yaml.safe_load(file)
                 file_name = Path(path).stem.replace('-', '_')
-                setattr(self, file_name, AttrDict(file_data, secure=secure))
+                setattr(self, file_name, self.create_config(file_data, secure=secure))
 
-    def get(self, key: str, required: bool = False) -> Secure | None:
+    def create_config(self, data: dict, secure: bool):
+        if self.as_attrdict:
+            return AttrDict(data, secure=secure)
+        else:
+            return {key: Secure(val) if secure and not isinstance(val, dict) else val 
+                    for key, val in self._recursive_dict(data).items()}
 
-        # Check environment variables
+    def _recursive_dict(self, data: dict):
+        return {key: self._recursive_dict(val) if isinstance(val, dict) else val for key, val in data.items()}
+
+    def get(self, key: str, required: bool = False, secure: bool = False) -> Any:
+        attr_value = getattr(self, key, None)
+        if attr_value is not None:
+            return Secure(attr_value) if secure and not isinstance(attr_value, (AttrDict, dict)) else attr_value
         env_value = os.getenv(key)
+        if env_value is not None:
+            return Secure(env_value) if secure else env_value
+        if required:
+            raise ValueError(f"Key '{key}' not found in configuration or OS environment.")
+        return None
 
-        if env_value is None:
-            if required:
-                raise ValueError(f"Key '{key}' not found in the OS environment.")
-
-        return Secure(env_value)
+    def use_attrdict(self, use: bool):
+        self.as_attrdict = use
+        for key, value in self.__dict__.items():
+            if isinstance(value, (AttrDict, dict)):
+                self.__dict__[key] = AttrDict(value, secure=value.secure) if use else dict(value)
