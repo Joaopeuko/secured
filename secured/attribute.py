@@ -43,7 +43,7 @@ class AttrDict(dict): # type: ignore
         for key, value in list(self.items()):
             self[key] = self._convert_value(value)
 
-    def _convert_value(self, value: dict | str) -> 'AttrDict' | Secure | str: # type: ignore
+    def _convert_value(self, value: dict | str) -> Secure | str: # type: ignore
         """
         Converts and possibly secures the value based on its type and the secure setting.
 
@@ -59,7 +59,7 @@ class AttrDict(dict): # type: ignore
             return Secure(value, self.message)
         return value
 
-    def __getattr__(self, item: str) -> 'AttrDict' | Secure:
+    def __getattr__(self, item: str) -> Secure:
         """
         Enables attribute-style access to dictionary keys.
 
