@@ -35,7 +35,7 @@ jobs:
           twine upload --skip-existing --repository-url https://test.pypi.org/legacy/ dist/*
 
       - name: Publish to PyPI (if it's a new tag)
-        if: github.ref == 'refs/heads/master'
+        if: startsWith(github.ref, 'refs/tags/')
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
