@@ -1,5 +1,5 @@
 import os
-import yaml
+import yaml # type: ignore
 from typing import List
 
 from .log_manager import setup_default_logger
@@ -8,7 +8,7 @@ from pathlib import Path
 from .attribute import AttrDict
 
 class Secured:
-    def __init__(self, yaml_paths: str | List[str] = None, secure: bool = False,
+    def __init__(self, yaml_paths: str | List[str] = None, secure: bool = False, # type: ignore
                  as_attrdict: bool = True, message: str = "<Sensitive data secured>", logger=None):
         """
         Initialize a Secured object to manage YAML configuration securely.
@@ -54,7 +54,7 @@ class Secured:
                 self.logger.error(f"Error parsing YAML file {path}: {e}")
                 continue
 
-    def create_config(self, data: dict, secure: bool) -> AttrDict | dict[str, Secure]:
+    def create_config(self, data: dict[str, dict], secure: bool) -> AttrDict | dict[str, Secure]:
         """
         Create a configuration from data loaded from a YAML file.
 

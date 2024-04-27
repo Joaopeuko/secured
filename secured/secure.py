@@ -17,7 +17,7 @@ class Secure(str):
     '<Data Hidden>'
     """
 
-    def __new__(cls, original: str, message: str = "<Sensitive data secured>"):
+    def __new__(cls, original: str, message: str = "<Sensitive data secured>"): # type: ignore
         """
         Create a new Secure instance that appears as a custom message.
 

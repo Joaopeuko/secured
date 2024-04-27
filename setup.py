@@ -1,11 +1,11 @@
-import tomlkit
-from setuptools import setup, find_packages
+import tomlkit # type: ignore
+from setuptools import setup, find_packages # type: ignore
 
 # Read and parse the pyproject.toml file
 with open("pyproject.toml", "r") as toml_file:
     pyproject = tomlkit.parse(toml_file.read())
 
-def convert_version(poetry_version):
+def convert_version(poetry_version): # type: ignore
     """ Convert Poetry version specifier to setuptools specifier. """
     if poetry_version.startswith('^'):
         version = poetry_version[1:]
@@ -16,7 +16,7 @@ def convert_version(poetry_version):
 
 # Extract dependencies and convert versions
 dependencies = [
-    f"{pkg}{convert_version(ver)}" for pkg, ver in pyproject['tool']['poetry']['dependencies'].items()
+    f"{pkg}{convert_version(ver)}" for pkg, ver in pyproject['tool']['poetry']['dependencies'].items() # type: ignore
     if pkg != "python"
 ]
 

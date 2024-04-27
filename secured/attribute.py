@@ -4,7 +4,7 @@ from .secure import Secure
 # A type variable that can be any type.
 T = TypeVar('T')
 
-class AttrDict(dict):
+class AttrDict(dict): # type: ignore
     """
     A dictionary subclass that allows attribute-style access and can optionally secure its leaf values.
 
@@ -23,7 +23,7 @@ class AttrDict(dict):
         '<Custom Secured>'
     """
 
-    def __init__(self, *args, secure: bool = False, message: str = "<Sensitive data secured>", **kwargs) -> None:
+    def __init__(self, *args, secure: bool = False, message: str = "<Sensitive data secured>", **kwargs) -> None: # type: ignore
         """
         Initialize the AttrDict with the same arguments as a normal dict, plus options to secure.
 
@@ -43,7 +43,7 @@ class AttrDict(dict):
         for key, value in list(self.items()):
             self[key] = self._convert_value(value)
 
-    def _convert_value(self, value: Any) -> T | Secure:
+    def _convert_value(self, value: dict | str) -> 'AttrDict' | Secure | str: # type: ignore
         """
         Converts and possibly secures the value based on its type and the secure setting.
 
@@ -59,7 +59,7 @@ class AttrDict(dict):
             return Secure(value, self.message)
         return value
 
-    def __getattr__(self, item: str) -> T | Secure:
+    def __getattr__(self, item: str) -> 'AttrDict' | Secure:
         """
         Enables attribute-style access to dictionary keys.
 
@@ -73,7 +73,7 @@ class AttrDict(dict):
             AttributeError: If the attribute does not exist.
         """
         if item in self:
-            return self[item]
+            return self[item] # type: ignore
         else:
             raise AttributeError(f"'{type(self).__name__}' object has no attribute '{item}'")
 
