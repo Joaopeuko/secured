@@ -1,4 +1,3 @@
-from typing import Union
 
 class Secure(str):
     """
@@ -9,7 +8,7 @@ class Secure(str):
     with a specific message.
 
     Attributes:
-        message (str): Custom message to represent the secured data when printed or logged.
+        message: Custom message to represent the secured data when printed or logged.
 
     Example:
     >>> DATABASE_URL = "your_actual_database_url"
@@ -23,8 +22,8 @@ class Secure(str):
         Create a new Secure instance that appears as a custom message.
 
         Args:
-            original (str): The original string to secure.
-            message (str): A placeholder message to display instead of the original content.
+            original: The original string to secure.
+            message: A placeholder message to display instead of the original content.
 
         Returns:
             Secure: A new Secure instance displaying the placeholder message.
@@ -38,8 +37,8 @@ class Secure(str):
         need to handle the data directly.
 
         Args:
-            original (str): The original data to secure.
-            message (str): A custom message to use for representing the secured data.
+            original: The original data to secure.
+            message: A custom message to use for representing the secured data.
         """
         super().__init__()
         self.original = original
@@ -63,7 +62,7 @@ class Secure(str):
         """
         return self.__repr__()
 
-    def to_int(self) -> Union[int, str]:
+    def to_int(self) -> int | str:
         """
         Try converting the original secured data to an integer.
 
@@ -75,7 +74,7 @@ class Secure(str):
         except ValueError:
             return self.message
 
-    def to_float(self) -> Union[float, str]:
+    def to_float(self) -> float | str:
         """
         Try converting the original secured data to a float.
 

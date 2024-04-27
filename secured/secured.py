@@ -1,59 +1,60 @@
 import os
 import yaml
-from typing import Union, List, Any
+from typing import List
+
+from .log_manager import setup_default_logger
 from .secure import Secure
 from pathlib import Path
 from .attribute import AttrDict
 
 class Secured:
-    def __init__(self, yaml_paths: Union[str, List[str]] = None, secure: bool = False, 
-                 as_attrdict: bool = True, message: str = "<Sensitive data secured>"):
+    def __init__(self, yaml_paths: str | List[str] = None, secure: bool = False, 
+                 as_attrdict: bool = True, message: str = "<Sensitive data secured>", logger=None):
         """
         Initialize a Secured object to manage YAML configuration securely.
-
+        
         Args:
-        yaml_paths (Union[str, List[str]], optional): Paths to YAML files that should be loaded.
-        secure (bool, optional): Flag to determine if data should be secured. Defaults to False.
-        as_attrdict (bool, optional): If True, loaded data will be stored as AttrDict objects. Defaults to True.
-        message (str, optional): Custom message to use when data is secured. Defaults to "<Sensitive data secured>".
-
-        Loads YAML files, creates configuration as specified by flags, and handles data securely if requested.
+            yaml_paths: Paths to YAML files that should be loaded.
+            secure: Flag to determine if data should be secured. Defaults to False.
+            as_attrdict: If True, loaded data will be stored as AttrDict objects. Defaults to True.
+            message: Custom message to use when data is secured. Defaults to "<Sensitive data secured>".
+            logger: External logger for logging messages, can be None. If None, a default logger is created.
         """
         self.as_attrdict = as_attrdict
         self.secure = secure
-        self.message = message  # Custom message for secured data
+        self.message = message
+        self.logger = logger or setup_default_logger()
         self.load_yaml(yaml_paths=yaml_paths, secure=secure)
 
-    def load_yaml(self, yaml_paths: Union[str, List[str]], secure: bool) -> None:
+
+    def load_yaml(self, yaml_paths: str | List[str], secure: bool) -> None:
         """
         Load and process YAML files from specified paths.
 
         Args:
-        yaml_paths (Union[str, List[str]]): Paths to the YAML configuration files.
-        secure (bool): Indicates if the data should be secured.
+        yaml_paths: Paths to the YAML configuration files.
+        secure: Indicates if the data should be secured.
 
         Processes each YAML file, converting content to AttrDict or secure data structures as required.
         """
         if not yaml_paths:
-                return
-        if isinstance(yaml_paths, str):
-            yaml_paths = [yaml_paths]
+            return
+        yaml_paths = [yaml_paths] if isinstance(yaml_paths, str) else yaml_paths
 
         for path in yaml_paths:
             try:
                 with open(path, 'r') as file:
                     file_data = yaml.safe_load(file)
+                file_name = Path(path).stem.replace('-', '_')
+                setattr(self, file_name, self.create_config(file_data, secure=secure))
             except FileNotFoundError:
-                print(f"Error: File {path} not found.")
+                self.logger.error(f"File {path} not found.")
                 continue
             except yaml.YAMLError as e:
-                print(f"Error parsing YAML file {path}: {e}")
+                self.logger.error(f"Error parsing YAML file {path}: {e}")
                 continue
 
-            file_name = Path(path).stem.replace('-', '_')
-            setattr(self, file_name, self.create_config(file_data, secure=secure))
-
-    def create_config(self, data: dict, secure: bool) -> Union[AttrDict, dict]:
+    def create_config(self, data: dict, secure: bool) -> AttrDict | dict[str, Secure]:
         """
         Create a configuration from data loaded from a YAML file.
 
@@ -82,29 +83,25 @@ class Secured:
         """
         return {key: self._recursive_dict(val) if isinstance(val, dict) else val for key, val in data.items()}
 
-    def get(self, key: str, required: bool = False, secure: bool = False) -> Secure | None:
+    def get(self, key: str, required: bool = False) -> Secure | None:
         """
-        Retrieve configuration value by key, optionally securing it.
+        Retrieve configuration value by key, securing it.
 
         Args:
         key (str): The key for the configuration value.
         required (bool, optional): Whether the key is required (raises an error if not found).
-        secure (bool, optional): Whether to secure the returned value.
 
         Returns:
-        Any: The value associated with the key, optionally secured.
-
+            The value associated with the key, secured.
         Raises:
-        ValueError: If the key is required but not found.
+            ValueError: If the key is required but not found.
         """
-        attr_value = getattr(self, key, None)
-        if attr_value is not None:
-            return Secure(attr_value, self.message) if secure and not isinstance(attr_value, (AttrDict, dict)) else attr_value
         env_value = os.getenv(key)
         if env_value is not None:
-            return Secure(env_value, self.message) if secure else env_value
+            return Secure(env_value, self.message) 
         if required:
-            raise ValueError(f"Key '{key}' not found in configuration or OS environment.")
+            self.logger.error(f"Key '{key}' not found in configuration or OS environment.")
+            raise ValueError(f"Key '{key}' not found.")
         return None
 
     def use_attrdict(self, use: bool) -> None:

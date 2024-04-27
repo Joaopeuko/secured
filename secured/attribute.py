@@ -29,8 +29,8 @@ class AttrDict(dict):
 
         Args:
             *args: Variable length argument list for dictionary items.
-            secure (bool): If True, non-dict values will be wrapped by the Secure class with the given message.
-            message (str): Custom message used when values are secured.
+            secure: If True, non-dict values will be wrapped by the Secure class with the given message.
+            message: Custom message used when values are secured.
             **kwargs: Arbitrary keyword arguments for dictionary items.
         """
         super().__init__(*args, **kwargs)
@@ -43,15 +43,15 @@ class AttrDict(dict):
         for key, value in list(self.items()):
             self[key] = self._convert_value(value)
 
-    def _convert_value(self, value: Any) -> Union[T, 'Secure']:
+    def _convert_value(self, value: Any) -> T | Secure:
         """
         Converts and possibly secures the value based on its type and the secure setting.
 
         Args:
-            value (Any): The value to be converted and possibly secured.
+            value: The value to be converted and possibly secured.
 
         Returns:
-            Union[T, Secure]: The converted value, secured if `secure` is True and not a dictionary.
+            The converted value, secured if `secure` is True and not a dictionary.
         """
         if isinstance(value, dict):
             return AttrDict(value, secure=self.secure, message=self.message)
@@ -59,15 +59,15 @@ class AttrDict(dict):
             return Secure(value, self.message)
         return value
 
-    def __getattr__(self, item: str) -> Union[T, 'Secure']:
+    def __getattr__(self, item: str) -> T | Secure:
         """
         Enables attribute-style access to dictionary keys.
 
         Args:
-            item (str): The attribute/key name to access.
+            item: The attribute/key name to access.
 
         Returns:
-            Union[T, Secure]: The value associated with 'item'.
+            The value associated with 'item'.
 
         Raises:
             AttributeError: If the attribute does not exist.
@@ -82,8 +82,8 @@ class AttrDict(dict):
         Sets the attribute or dictionary key to the specified value.
 
         Args:
-            key (str): Attribute name or dictionary key.
-            value (Any): The value to set for the given key.
+            key: Attribute name or dictionary key.
+            value: The value to set for the given key.
 
         This directly modifies the dictionary if `key` is not a special attribute.
         """
@@ -97,7 +97,7 @@ class AttrDict(dict):
         Overrides the method to secure values when being set through item assignment.
 
         Args:
-            key (str): The dictionary key where the value should be set.
-            value (Any): The value to set, which will be secured if applicable.
+            key: The dictionary key where the value should be set.
+            value: The value to set, which will be secured if applicable.
         """
         super().__setitem__(key, self._convert_value(value))
