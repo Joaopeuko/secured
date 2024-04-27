@@ -54,7 +54,7 @@ class AttrDict(dict): # type: ignore
             The converted value, secured if `secure` is True and not a dictionary.
         """
         if isinstance(value, dict):
-            return AttrDict(value, secure=self.secure, message=self.message)
+            return AttrDict(value, secure=self.secure, message=self.message)  # type: ignore
         elif self.secure:
             return Secure(value, self.message)
         return value

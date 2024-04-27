@@ -1,6 +1,6 @@
 import os
 import yaml # type: ignore
-from typing import List
+from typing import List, Dict, Any
 
 from .log_manager import setup_default_logger
 from .secure import Secure
@@ -54,7 +54,7 @@ class Secured:
                 self.logger.error(f"Error parsing YAML file {path}: {e}")
                 continue
 
-    def create_config(self, data: dict[str, dict], secure: bool) -> AttrDict | dict[str, Secure]:
+    def create_config(self, data:  Dict[str, Any], secure: bool) ->  Dict[str, Any]:  # type: ignore
         """
         Create a configuration from data loaded from a YAML file.
 
@@ -71,15 +71,15 @@ class Secured:
             return {key: Secure(val, self.message) if secure and not isinstance(val, dict) else val
                     for key, val in self._recursive_dict(data).items()}
 
-    def _recursive_dict(self, data: dict) -> dict:
+    def _recursive_dict(self, data:  Dict[str, Any]) -> Dict[str, Any]:  # type: ignore[type-arg]
         """
         Recursively parse and secure dictionary data.
 
         Args:
-        data (dict): Data to parse.
+            data: Data to parse.
 
         Returns:
-        dict: Parsed data, potentially secured.
+            Parsed data, potentially secured.
         """
         return {key: self._recursive_dict(val) if isinstance(val, dict) else val for key, val in data.items()}
 
@@ -88,8 +88,8 @@ class Secured:
         Retrieve configuration value by key, securing it.
 
         Args:
-        key (str): The key for the configuration value.
-        required (bool, optional): Whether the key is required (raises an error if not found).
+            key: The key for the configuration value.
+            required: Whether the key is required (raises an error if not found).
 
         Returns:
             The value associated with the key, secured.
@@ -109,9 +109,9 @@ class Secured:
         Toggle the use of AttrDict for storing data.
 
         Args:
-        use (bool): Flag indicating whether to use AttrDict.
+            use: Flag indicating whether to use AttrDict.
         """
         self.as_attrdict = use
         for key, value in self.__dict__.items():
             if isinstance(value, (AttrDict, dict)):
-                self.__dict__[key] = AttrDict(value, secure=value.secure) if use else dict(value)
+                self.__dict__[key] = AttrDict(value, secure=self.secure) if use else dict(value) # type: ignore
