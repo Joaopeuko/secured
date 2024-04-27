@@ -8,11 +8,11 @@ from pathlib import Path
 from .attribute import AttrDict
 
 class Secured:
-    def __init__(self, yaml_paths: str | List[str] = None, secure: bool = False, 
+    def __init__(self, yaml_paths: str | List[str] = None, secure: bool = False,
                  as_attrdict: bool = True, message: str = "<Sensitive data secured>", logger=None):
         """
         Initialize a Secured object to manage YAML configuration securely.
-        
+
         Args:
             yaml_paths: Paths to YAML files that should be loaded.
             secure: Flag to determine if data should be secured. Defaults to False.
@@ -98,7 +98,7 @@ class Secured:
         """
         env_value = os.getenv(key)
         if env_value is not None:
-            return Secure(env_value, self.message) 
+            return Secure(env_value, self.message)
         if required:
             self.logger.error(f"Key '{key}' not found in configuration or OS environment.")
             raise ValueError(f"Key '{key}' not found.")

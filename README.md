@@ -7,7 +7,6 @@
     - [Example 2: Custom Usage](#example-2-custom-usage)
   - [Features](#features)
 
-
 Secure your Python data structures and secrets with Secured. This package provides a straightforward solution for obscuring sensitive data in applications. It's specifically designed for developers who need to protect API keys, database credentials, and other critical configuration details from accidental exposure. Featuring customizable security measures, our tool allows you to control how sensitive information is represented and managed securely. It's ideal for projects that demand high data confidentiality and integrity. Please note that this provides a thin layer of protection.
 
 ## Installation
