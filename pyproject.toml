@@ -7,13 +7,14 @@ license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 pyyaml = "^6.0.1"
 
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.7.0"
 python-dotenv = "^1.0.1"
+tomlkit = "^0.12.4"
 
 [build-system]
 requires = ["poetry-core"]

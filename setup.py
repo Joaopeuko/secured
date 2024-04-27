@@ -1,23 +1,28 @@
+import tomlkit
 from setuptools import setup, find_packages
-import toml
 
-# Load and parse the pyproject.toml file
-with open("pyproject.toml", "r") as f:
-    pyproject = toml.load(f)
+# Read and parse the pyproject.toml file
+with open("pyproject.toml", "r") as toml_file:
+    pyproject = tomlkit.parse(toml_file.read())
 
-# Extract dependencies
-dependencies = pyproject['tool']['poetry']['dependencies']
-dev_dependencies = pyproject['tool']['poetry']['group']['dev']['dependencies']
+def convert_version(poetry_version):
+    """ Convert Poetry version specifier to setuptools specifier. """
+    if poetry_version.startswith('^'):
+        version = poetry_version[1:]
+        major_version = version.split('.')[0]
+        next_major_version = str(int(major_version) + 1)
+        return f">={version},<{next_major_version}.0.0"
+    return poetry_version
+
+# Extract dependencies and convert versions
+dependencies = [
+    f"{pkg}{convert_version(ver)}" for pkg, ver in pyproject['tool']['poetry']['dependencies'].items()
+    if pkg != "python"
+]
 
 # Read README.md for the long description
 with open("README.md", "r") as file:
     long_description = file.read()
-
-# Convert dependencies to the required format for setuptools
-install_requires = [f"{dep}{version}" for dep, version in dependencies.items() if dep != "python"]
-extras_require = {
-    "dev": [f"{dep}{version}" for dep, version in dev_dependencies.items()]
-}
 
 setup(
     name="secured",
@@ -34,6 +39,5 @@ setup(
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.8",
-    install_requires=install_requires,
-    extras_require=extras_require
+    install_requires=dependencies
 )
