@@ -1,23 +1,8 @@
+from typing import Union
+
 
 class Secure(str):
-    """
-    A class for securing sensitive data.
-
-    This class is designed to add a thin layer of protection by obscuring sensitive data, such as database URLs or API keys,
-    in order to prevent accidental exposure in logs or debug output. The representation of the secured data can be customized
-    with a specific message.
-
-    Attributes:
-        message: Custom message to represent the secured data when printed or logged.
-
-    Example:
-    >>> DATABASE_URL = "your_actual_database_url"
-    >>> sensitive_data = Secure(DATABASE_URL, "<Data Hidden>")
-    >>> print(sensitive_data)
-    '<Data Hidden>'
-    """
-
-    def __new__(cls, original: str, message: str = "<Sensitive data secured>"): # type: ignore
+    def __new__(cls, original: str, message: str = "<Sensitive data secured>"):
         """
         Create a new Secure instance that appears as a custom message.
 
@@ -28,21 +13,14 @@ class Secure(str):
         Returns:
             Secure: A new Secure instance displaying the placeholder message.
         """
-        # Initialize the Secure instance with the message instead of the original content.
-        return super(Secure, cls).__new__(cls, message)
+        instance = super(Secure, cls).__new__(cls, original)
+        instance._original = original
+        instance._message = message
+        return instance
 
     def __init__(self, original: str, message: str = "<Sensitive data secured>"):
-        """
-        Initializes a Secure object. The initialization logic is handled by __new__; __init__ does not
-        need to handle the data directly.
-
-        Args:
-            original: The original data to secure.
-            message: A custom message to use for representing the secured data.
-        """
-        super().__init__()
-        self.original = original
-        self.message = message
+        # Initialization handled in __new__, nothing required here
+        pass
 
     def __repr__(self) -> str:
         """
@@ -51,7 +29,7 @@ class Secure(str):
         Returns:
             str: The custom message representing the secured data.
         """
-        return self.message
+        return self._message
 
     def __str__(self) -> str:
         """
@@ -60,9 +38,9 @@ class Secure(str):
         Returns:
             str: The custom message representing the secured data.
         """
-        return self.__repr__()
+        return self._message
 
-    def to_int(self) -> int | str:
+    def to_int(self) -> Union[int, str]:
         """
         Try converting the original secured data to an integer.
 
@@ -70,11 +48,11 @@ class Secure(str):
             Union[int, str]: The integer value of the original data, or the custom message if conversion fails.
         """
         try:
-            return int(self.original)
+            return int(self._original)
         except ValueError:
-            return self.message
+            return self._message
 
-    def to_float(self) -> float | str:
+    def to_float(self) -> Union[float, str]:
         """
         Try converting the original secured data to a float.
 
@@ -82,6 +60,6 @@ class Secure(str):
             Union[float, str]: The float value of the original data, or the custom message if conversion fails.
         """
         try:
-            return float(self.original)
+            return float(self._original)
         except ValueError:
-            return self.message
+            return self._message

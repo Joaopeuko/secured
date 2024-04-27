@@ -10,3 +10,4 @@ ad = AttrDict(secure=True, message=message)
 ad['password'] = 'my_secret'
 print((ad.password))
 print((ad['password']))
+print(ad.password == "my_secret")

@@ -1,3 +1,8 @@
+![PyPI - Downloads](https://img.shields.io/pypi/dm/secured)
+![PyPI](https://img.shields.io/pypi/v/secured)
+![PyPI - Wheel](https://img.shields.io/pypi/wheel/secured)
+![PyPI - License](https://img.shields.io/pypi/l/secured)
+
 # Secured
 
 - [Secured](#secured)
