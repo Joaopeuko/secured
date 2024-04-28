@@ -1,7 +1,7 @@
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/secured)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/secured)
 ![PyPI](https://img.shields.io/pypi/v/secured)
-[![codecov](https://codecov.io/gh/your_username/your_repository/branch/main/graph/badge.svg?token=YOUR_TOKEN)](https://codecov.io/gh/your_username/your_repository)
+[![codecov](https://codecov.io/gh/Joaopeuko/secured/graph/badge.svg?token=W5MF118U50)](https://codecov.io/gh/Joaopeuko/secured)
 ![PyPI - Wheel](https://img.shields.io/pypi/wheel/secured)
 ![PyPI - License](https://img.shields.io/pypi/l/secured)
 
