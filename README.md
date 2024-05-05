@@ -12,6 +12,7 @@
   - [Usage](#usage)
     - [Example 1: Basic Usage](#example-1-basic-usage)
     - [Example 2: Custom Usage](#example-2-custom-usage)
+    - [Example 3: Config Usage](#example-3-config-usage)
   - [Features](#features)
 
 Secure your Python data structures and secrets with Secured. This package provides a straightforward solution for obscuring sensitive data in applications. It's specifically designed for developers who need to protect API keys, database credentials, and other critical configuration details from accidental exposure. Featuring customizable security measures, our tool allows you to control how sensitive information is represented and managed securely. It's ideal for projects that demand high data confidentiality and integrity. Please note that this provides a thin layer of protection.
@@ -52,6 +53,21 @@ secure_api_key = Secure(API_KEY, "API Key Protected")
 
 # Usage in code
 print(secure_api_key)  # Output: API Key Protected
+```
+
+### Example 3: Config Usage
+
+The `Secured` class allows you to securely read configuration files containing sensitive data. Here's how you can use it:
+
+```python
+from secured.secured import Secured
+
+# Create a Secured object to read a YAML configuration file
+secured = Secured('config.yaml', secure=True)
+
+# Access configuration attributes securely
+print(secured.config.name)  # Using dot notation
+print(secured.config["name"])  # Using dictionary-like notation
 ```
 
 ## Features
