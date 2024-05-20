@@ -115,3 +115,14 @@ class Secured:
         for key, value in self.__dict__.items():
             if isinstance(value, (AttrDict, dict)):
                 self.__dict__[key] = AttrDict(value, secure=self.secure) if use else dict(value) # type: ignore
+
+    def compose(self, composition: str, **secured_secrets) -> Secure:
+        # Create a context with the original values of Secure objects
+        context = {key: value._get_original() if isinstance(value, Secure) else value
+                for key, value in secured_secrets.items()}
+
+        # Replace Secure objects in the format string with their original values
+        composed = composition.format(**context)
+
+        # Return a new Secure instance with the combined secret
+        return Secure(composed, self.message)

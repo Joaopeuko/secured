@@ -63,3 +63,12 @@ class Secure(str):
             return float(self._original)
         except ValueError:
             return self._message
+
+    def _get_original(self) -> str:
+        """
+        Retrieve the original secured data.
+
+        Returns:
+            str: The original data.
+        """
+        return self._original
