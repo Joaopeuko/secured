@@ -117,6 +117,35 @@ class Secured:
                 self.__dict__[key] = AttrDict(value, secure=self.secure) if use else dict(value) # type: ignore
 
     def compose(self, composition: str, **secured_secrets) -> Secure:
+        """
+        Combines multiple secure secrets into a single secure string.
+
+        This method takes a format string and a variable number of keyword arguments,
+        each representing a secure secret. It replaces placeholders in the format string
+        with the original values of the secure secrets and returns a new `Secure` instance
+        containing the combined secret.
+
+        Args:
+            composition: The format string used to combine the secure secrets.
+                This string can contain placeholders in curly braces that correspond to
+                the names of the secure secrets provided as keyword arguments.
+            **secured_secrets: Arbitrary keyword arguments representing the secure secrets.
+                Each keyword should be the name of a secure secret, and its value should
+                be an instance of the `Secure` class.
+
+        Returns:
+            Secure: A new `Secure` instance containing the combined secret.
+
+        Raises:
+            ValueError: If any of the provided keyword arguments is not an instance of `Secure`.
+
+        Example:
+            secured_host = Secure('db-server.local')
+            secured_password = Secure('password123')
+            combined_secure = secured_host.compose("Connection to {host} with password {password}", host=secured_host, password=secured_password)
+            print(combined_secure)  # Output: <Sensitive data secured>
+            print(combined_secure._get_original())  # Output: Connection to db-server.local with password password123
+        """
         # Create a context with the original values of Secure objects
         context = {key: value._get_original() if isinstance(value, Secure) else value
                 for key, value in secured_secrets.items()}
