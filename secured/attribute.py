@@ -1,10 +1,9 @@
-from typing import Any, TypeVar
+from typing import Any, TypeVar, Union
 from .secure import Secure
 
-# A type variable that can be any type.
 T = TypeVar('T')
 
-class AttrDict(dict): # type: ignore
+class AttrDict(dict):  # type: ignore
     """
     A dictionary subclass that allows attribute-style access and can optionally secure its leaf values.
 
@@ -23,7 +22,7 @@ class AttrDict(dict): # type: ignore
         '<Custom Secured>'
     """
 
-    def __init__(self, *args, secure: bool = False, message: str = "<Sensitive data secured>", **kwargs) -> None: # type: ignore
+    def __init__(self, *args, secure: bool = False, message: str = "<Sensitive data secured>", **kwargs) -> None:  # type: ignore
         """
         Initialize the AttrDict with the same arguments as a normal dict, plus options to secure.
 
@@ -43,7 +42,7 @@ class AttrDict(dict): # type: ignore
         for key, value in list(self.items()):
             self[key] = self._convert_value(value)
 
-    def _convert_value(self, value: dict | str) -> Secure | str: # type: ignore
+    def _convert_value(self, value: Union[dict, str, Any]) -> Union[Secure, 'AttrDict', Any]:
         """
         Converts and possibly secures the value based on its type and the secure setting.
 
@@ -54,12 +53,36 @@ class AttrDict(dict): # type: ignore
             The converted value, secured if `secure` is True and not a dictionary.
         """
         if isinstance(value, dict):
-            return AttrDict(value, secure=self.secure, message=self.message)  # type: ignore
-        elif self.secure:
-            return Secure(value, self.message)
+            value = AttrDict(value, secure=self.secure, message=self.message)  # type: ignore
+        elif self.secure and not isinstance(value, Secure):
+            value = Secure(value, self.message)
         return value
 
-    def __getattr__(self, item: str) -> Secure:
+    def _get_original(self, item: str) -> Any:
+        """
+        Retrieves the original value of the specified item, without any securing.
+
+        Args:
+            item: The attribute/key name to access.
+
+        Returns:
+            The original value associated with 'item'.
+
+        Raises:
+            AttributeError: If the attribute does not exist.
+        """
+        if item in self:
+            value = self[item]
+            if isinstance(value, Secure):
+                return value._get_original()
+            elif isinstance(value, AttrDict):
+                return {k: v._get_original() if isinstance(v, Secure) else v for k, v in value.items()}
+            else:
+                return value
+        else:
+            raise AttributeError(f"'{type(self).__name__}' object has no attribute '{item}'")
+
+    def __getattr__(self, item: str) -> Any:
         """
         Enables attribute-style access to dictionary keys.
 

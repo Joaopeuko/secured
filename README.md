@@ -13,6 +13,7 @@
     - [Example 1: Basic Usage](#example-1-basic-usage)
     - [Example 2: Custom Usage](#example-2-custom-usage)
     - [Example 3: Config Usage](#example-3-config-usage)
+    - [Example 4: Compose](#example-4-compose)
   - [Features](#features)
 
 Secure your Python data structures and secrets with Secured. This package provides a straightforward solution for obscuring sensitive data in applications. It's specifically designed for developers who need to protect API keys, database credentials, and other critical configuration details from accidental exposure. Featuring customizable security measures, our tool allows you to control how sensitive information is represented and managed securely. It's ideal for projects that demand high data confidentiality and integrity. Please note that this provides a thin layer of protection.
@@ -68,6 +69,26 @@ secured = Secured('config.yaml', secure=True)
 # Access configuration attributes securely
 print(secured.config.name)  # Using dot notation
 print(secured.config["name"])  # Using dictionary-like notation
+```
+
+### Example 4: Compose
+
+```python
+from secured.secured import Secured
+
+# Define the custom secure message
+message = "🔒 <Data Secured> 🔒"
+
+# Example secured object
+CONFIG_PATH = "examples/config.yaml"
+DATABASE_URL = "mysql://{user}:{password}@localhost/dbname"
+secure = Secured(CONFIG_PATH, secure=True, message=message)
+
+# Usage in code
+secure_database_url = secure.compose(DATABASE_URL, user="guest", password="guest_password")
+print(secure_database_url)  # Output: 🔒 <Data Secured> 🔒
+print(secure_database_url.get_original()) # Careful! This will print the original data, do not use it.
+print(secure_database_url == "mysql://guest:guest_password@localhost/dbname")  # Output: True
 ```
 
 ## Features
