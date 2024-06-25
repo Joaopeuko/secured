@@ -61,7 +61,7 @@ print(secure_api_key)  # Output: API Key Protected
 The `Secured` class allows you to securely read configuration files containing sensitive data. Here's how you can use it:
 
 ```python
-from secured.secured import Secured
+from secured import Secured
 
 # Create a Secured object to read a YAML configuration file
 secured = Secured('config.yaml', secure=True)
@@ -74,7 +74,7 @@ print(secured.config["name"])  # Using dictionary-like notation
 ### Example 4: Compose
 
 ```python
-from secured.secured import Secured
+from secured import Secured
 
 # Define the custom secure message
 message = "🔒 <Data Secured> 🔒"
