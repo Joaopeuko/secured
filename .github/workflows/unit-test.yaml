@@ -24,7 +24,7 @@ jobs:
 
       - name: Run pytest with coverage
         run: |
-          poetry run pytest --cov=secured tests/
+          poetry run pytest --cov=secured --cov-report term-missing tests/
 
       - name: Generate coverage report
         run: |
